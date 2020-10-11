@@ -1,0 +1,236 @@
+-- 주석달기
+/*
+주석라인1
+주석라인2
+주석라인3
+*/
+SELECT *FROM Country; --*의 의미는 모든 columm을 찾는다는 의미
+SELECT *FROM Country ORDER BY GNP; --GNP기준 내림차순정렬
+SELECT *FROM Country ORDER BY Population;--인구기준 내림차순 정렬
+select SurfaceArea from Country; --Country 테이블에서 SurfaceArea를 출력 , 대문자 소문자 구분없이 사용가능하다.
+select name,SurfaceArea,Population, GNP from Country; --Country 테이블에서 name, SufaceArea,Population 출력
+select name,SurfaceArea,Population, GNP from Country order by Population desc; --인구수를 기준으로 오름차순 정렬
+select name,SurfaceArea,Population, GNP from Country order by Population asc;--내림차순
+select name, SurfaceArea, Population, GNP from Country order by SurfaceArea, GNP asc;--두가지 기준으로 정렬 먼저나오는 컬럼을 우선시한다. 
+
+select *from Country; --의 컬럼중에 lifeExp 기대수명항목이름을 변경하여 출력하고자 한다.
+select name, LifeExpectancy as 'Life Expectancy' from country; --이름 변
+select name as Country, code from Country order by Code desc; 
+//
+select *from Country;--인구와 같이 큰 숫자를 보기에 편하도록 변경한다.
+select name as Country, Population / 1000 as 'pop_1000s' from Country;--연산자는 일반적인 계산기 사용하듯이
+-- name 의 이름은 Country 로 Population / 1000를 pop_1000s로 변경하고 '' 를쓰는이유는 가독성 + 띄어쓰기 사용가능
+
+select count(*) from Country; --숫자 세기
+
+
+--상위 5개만 보고싶을때 때 
+select *from Country order by gnp desc limit 5;
+select *from Country order by gnp asc limit 5;
+
+--상위 5개를 건너띄고 출력하고 싶을 때
+select *from country;
+select *from Country order by name limit 5 offset 5;
+
+--WHERE 특정조건을 추가하여 정보를 필터링
+
+--인구가 작다면 무조건 GNP가 작을까?
+select name,population,gnp from country where population < 100000 order by gnp desc;
+
+--인구가 많다면 무조건 GNP가 클까?
+select name, population, gnp,surfacearea from country where population > 50000000 order by population desc;
+
+--인구가 많으면 땅이 무조건 넓을까?(x)
+select name, surfacearea from country where population > 50000000 order by population desc;
+-- 국가명, 땅 넓이 를 country로 부터 읽어오고 인구수가 5000만 이상인경우 인구수대로 내림차순정렬
+
+
+--and or not 사용
+
+
+select name, continent, population from country where population < 100000 and continent = 'Oceania' order by population desc;
+
+--between 사용
+select name, population from country where population between 1000 and 10000 order by population desc;--1000과 10000사이만 출력
+
+--불특정 문자열 
+select name, continent from country where name like '%island';--%를 기준으로 뒤에 island가 들어가있는것만 출력
+select name, continent from country where name like 'island%';--%앞의 문자를 앞에 가진 것만 출력
+select name, continent from country where name like '%island%'; --%와 % 사이 문자인 island가 사이에들어있는것 출력
+
+select name, continent from country where name like '___a';-- 언더바(_) 숫자만큼 의 뒤에 a를 가진 이름 출력
+
+
+--국가에서 이름이 korea가 들어가는 것 출
+select name from country where name like '%korea%';
+select *from country where name like '%korea%';
+
+-- in 사용 원하는 특정문자를 가진 컬럼 출력
+select name, continent from country where continent in('Europe','Asia');
+select countrycode, name from city;
+select distinct countrycode, name from city;--중복된것 제거
+
+select name from (select code, name, continent from country);
+
+--위의 코리아 들어간 문제를 임시 테이블화 시킨후 인구를 1000으로 나눠 출력하고 명칭또한 그에 맞게 변경시켜 출력하시오
+select population / 1000 as 'pop_10000s' from(select *from country where name like '%korea%');
+
+select *from country;
+select name, region from country where region like '%Asia%';
+select name, continent from country where continent like 'North%';
+
+select name, governmentform from country where governmentform like '__o%';
+select *from country where name in ('South Korea','Japan','China');
+
+select *from city;
+select name, district from city;
+select DISTINCT district from city; --district 로 중복된 값을 제거
+
+select surfacearea from(select *from country where name like '%Korea');
+
+
+--새로운 테이블 생성 및 제거 
+create table class6(my_name text, my_team text, score int);--새로운 테이블 생성
+select *from sqlite_master where type = 'table'; --테이블 확인
+
+insert into class6 values('이이삭','정해앙','100');--행 추가 
+select *from class6; 
+
+drop table class6; --해당테이블 제거 
+
+insert into class6(my_name, my_team) values ('이이삭','정해앙'); --score에 아무값도 넣지않으므로
+select *from class6;--NULL 출력한다 
+
+select *from world.City;--다른 테이블에 있는 값을 가져오기 world 파일의 city 를 가져온다.
+
+insert into class6(my_name,score) select name,population from world.city limit 5;
+select *from class6;
+
+--특정행의 컬럼 값을 변경 
+create table test(a text,b text,c int); --테이블 생성 
+
+insert into test(a,b,c) values('text_1','text_11',123); --행추가 
+insert into test(a,b,c) values('text_2','text_22',456);
+insert into test(a,b,c) values('text_3','text_33',789);
+
+select *from test;
+
+update test set c = 1234 where a = 'text_1'; --a의 값이 text_1인 행의 c 를 1234로 변경해준
+select *from test;
+
+delete from test where c is null; --c의 값이 null인경우 지운다 
+select *from test; --하나도 지워지지 않음 
+
+delete from test where c is not null;--c의 값이 NULL이 아닐경우 지운다 
+select *from test;--null인 값이 없으므로 모두 지워진다 
+
+drop table test; --테이블을 지운다
+
+--데이터베이스 연결
+--파일을 불러올수도있고 왼쪽창에서 드래그&드랍으로도 이동가능
+
+--가독성을위해 줄을 바꿔 써도된다 그리고 들여쓰기경우 자동으로 안되므로 스페이스 2번 
+create table test(
+id integer,--정수넣기위해 integer 이름은 id 문자타입 int식으로 따로 기재 
+study_time real,--실수를 넣기위해 real 
+name var(10),--최대 10문자 
+address varchar(255),--최대 255글
+class integer,
+hobby varchar(255),
+comment blob);
+
+select *from test;
+insert into test(id, name,class,hobby,comment) values(24,'이이삭',6,'음악감상','6반화이팅');
+delete from test where study_time is null;
+select *from test;
+
+
+create table test_1(
+a integer not null,
+b varchar(255));
+
+insert into test_1(a,b) values(1,'a');
+insert into test_1(a,b) values(null,'b');
+
+select *from test_1;
+
+create table test_2(
+a integer not null default 1,--기본값으로 1 을 넣는다. 
+b varchar(255) unique not null); -- 만약 이 테이블에 문자 b가 먼저 들어와있다면 
+--그다음에 b가들어올경우 에러 발생.
+
+insert into test_2(a,b) values(1,'b');
+insert into test_2(a,b) values(1,'b');
+insert into test_2(a,b) values(1,'c');
+select *from test_2;
+
+create table store_a(
+clint_id integer primary key autoincrement,--primery key는 고유값을 넣는다 
+--autoincrement는 1씩 자동적으로 증가하는 정수값을 넣어준다.
+menu_1 varchar(255),
+menu_2 varchar(255));
+
+insert into store_a(menu_1,menu_2) values('밥','단무지');
+insert into store_a(menu_1,menu_2) values('라면','김밥');
+insert into store_a(menu_1,menu_2) values('김밥','떡볶');
+
+select *from store_a;
+
+alter table store_a add column menu_3 varchar(100); --열 추가 
+select *from store_a;
+
+create table store_b as select menu_1, menu_2, menu_3 from store_a; --store_a를 store_b로 복사.
+select *from store_b;
+drop table store_a;
+
+alter table store_b rename to AI_store; --테이블 store_b의 이름을 변경
+
+
+--집계 함수 
+select count(*)from world.country; --행수 카운트 
+select count(population) from world.country; 
+select count(*)from world.country group by continent; --대륙별 국가의 개수
+select count(distinct continent)from world.country;
+select avg(population) from world.country where region = 'Western Europe';
+select min(population),max(population) from world.country where region = 'Western Europe';
+
+--join 두개의 테이블을 더하여 검색 
+
+--inner join
+create table employee(id integer, name text, dept_id integer);
+
+insert into employee values (1,'dekuma',1);
+insert into employee values (2,'kimic',3);
+insert into employee values (3,'araikuma',1);
+insert into employee values (4,'happykuma',2);
+insert into employee values (5,'mykuma',4);
+insert into employee values (6,'racoon',3);
+
+select *from employee;
+--테이블 1
+create table dept(id integer, name text);
+
+insert into dept values (1,'Sales');
+insert into dept values (2,'Manage');
+insert into dept values (3,'Dev');
+
+select *from dept;
+--테이블 2
+
+--테이블 1 + 테이블 2 
+select *from employee inner join dept on employee.dept_id = dept.id;
+select *from dept inner join employee on dept.id = employee.dept_id;
+
+--조회할 데이터 컬럼 지정방법
+select *from employee inner join dept on employee.dept_id = dept.id;
+
+select employee.id, employee.name, dept.name from employee
+  inner join dept on employee.dept_id = dept.id;
+  
+select employee.id, employee.name, dept_id, dept.name from employee
+  inner join dept on employee.dept_id = dept.id;
+  
+select name from employee inner join dept on employee.dept_id = dept.id;--에러출
+
+drop table dept;
+drop table employee;
